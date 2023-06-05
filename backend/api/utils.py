@@ -8,23 +8,24 @@ from rest_framework.response import Response
 from recipes.models import Recipe
 
 
-def serializer_add_delete(serializer_name, model, request, recipe_id):
+def serializer_add_method(serializer_name, request, recipe_id):
     user = request.user
     data = {'user': user.id, 'recipe': recipe_id}
     serializer = serializer_name(data=data, context={'request': request})
-    if request.method == 'POST':
-        serializer.is_valid(raise_exception=True)
-        serializer.save()
-        return response.Response(
-            serializer.data, status=status.HTTP_201_CREATED
-        )
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+def serializer_delete_method(model, request, recipe_id):
+    user = request.user
     get_object_or_404(
         model, user=user, recipe=get_object_or_404(Recipe, id=recipe_id)
     ).delete()
-    return response.Response(status=status.HTTP_204_NO_CONTENT)
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-def ingredients_export(self, request, ingredients):
+def export_ingredients(self, request, ingredients):
     user = self.request.user
     filename = f'{user.username}_shopping_list.txt'
 

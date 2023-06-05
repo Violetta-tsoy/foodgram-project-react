@@ -1,8 +1,10 @@
+from django.contrib.auth import get_user_model
 from django.core import validators
 from django.core.validators import MinValueValidator
 from django.db import models
 from django.db.models import UniqueConstraint
-from users.models import User
+
+User = get_user_model()
 
 
 class Tag(models.Model):
@@ -96,7 +98,7 @@ class Recipe(models.Model):
         verbose_name='Картинка',
         upload_to='recipes/images/',
     )
-    cooking_time = models.IntegerField(
+    cooking_time = models.PositiveIntegerField(
         verbose_name='Время приготовления (в минутах)',
         help_text='Введите время приготовления блюда в минутах',
         validators=[
@@ -192,8 +194,10 @@ class Favorite(FavoritesAndShopping):
         verbose_name_plural = 'Избранные рецепты'
         default_related_name = 'favorites'
         constraints = [
-            UniqueConstraint(fields=['user', 'recipe'],
-                             name='unique_favorite')
+            UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_favorite'
+            )
         ]
 
 
@@ -205,6 +209,8 @@ class ShoppingList(FavoritesAndShopping):
         verbose_name_plural = 'Рецепты в списке покупок'
         default_related_name = 'shopping_list'
         constraints = [
-            UniqueConstraint(fields=['user', 'recipe'],
-                             name='unique_shopping_cart')
+            UniqueConstraint(
+                fields=['user', 'recipe'],
+                name='unique_shopping_cart'
+            )
         ]

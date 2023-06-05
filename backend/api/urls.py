@@ -21,7 +21,7 @@ router.register(
 )
 router.register(
     'users',
-    views.CustomUserViewSet,
+    views.UserViewSet,
     basename='users',
 )
 

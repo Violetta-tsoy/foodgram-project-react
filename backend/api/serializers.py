@@ -21,11 +21,22 @@ from users.models import Follow, User
 class Base64ImageField(serializers.ImageField):
     def to_internal_value(self, data):
         if isinstance(data, str) and data.startswith('data:image'):
-            format, imgstr = data.split(';base64,')
-            ext = format.split('/')[-1]
-            data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+            format, image_string = data.split(';base64,')
+            file_extension = format.split('/')[-1]
+            data = ContentFile(
+                base64.b64decode(image_string),
+                name=f'temp.{file_extension}'
+            )
         return super().to_internal_value(data)
 
+# class Base64ImageField(serializers.ImageField):
+#     def to_internal_value(self, data):
+#         if isinstance(data, str) and data.startswith('data:image'):
+#             format, imgstr = data.split(';base64,')
+#             ext = format.split('/')[-1]
+#             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
+
+#         return super().to_internal_value(data)
 
 class UserGetSerializer(UserSerializer):
     """Сериализатор для просмотра профиля пользователя."""
@@ -181,7 +192,9 @@ class FavoriteAndShoppingCreateSerializer(serializers.ModelSerializer):
     Сериализатор для добавления рецептов в список избранного и корзину.
     """
     user = serializers.PrimaryKeyRelatedField(
-        read_only=True, default=serializers.CurrentUserDefault())
+        read_only=True,
+        default=serializers.CurrentUserDefault()
+    )
     recipe = serializers.PrimaryKeyRelatedField(
         queryset=Recipe.objects.all(),
         write_only=True,
@@ -206,8 +219,9 @@ class FavoriteSerializer(FavoriteAndShoppingCreateSerializer):
         ]
 
     def create(self, validated_data):
-        return Favorite.objects.create(
-            user=self.context.get('request').user, **validated_data)
+        return self.Meta.model.objects.create(
+            user=self.context.get('request').user, **validated_data
+        )
 
 
 class ShoppingListSerializer(FavoriteAndShoppingCreateSerializer):
@@ -224,8 +238,9 @@ class ShoppingListSerializer(FavoriteAndShoppingCreateSerializer):
         ]
 
     def create(self, validated_data):
-        return ShoppingList.objects.create(
-            user=self.context.get('request').user, **validated_data)
+        return self.Meta.model.objects.create(
+            user=self.context.get('request').user, **validated_data
+        )
 
 
 class TagSerializer(serializers.ModelSerializer):
@@ -343,7 +358,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, data):
         ingredients = self.initial_data.get('ingredients')
-        if len(ingredients) <= 0:
+        if not len(ingredients) != 0:
             raise exceptions.ValidationError(
                 {'ingredients': 'Невозможно добавить рецепт без ингредиентов!'}
             )
@@ -354,11 +369,11 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
                     {'ingredients': 'Ингредиенты не могут повторяться!'}
                 )
             ingredients_list.append(item['id'])
-            if int(item['amount']) <= 0:
+            if int(item['amount']) < 1:
                 raise exceptions.ValidationError(
                     {
                         'amount': (
-                            'Количество ингредиентов не может быть меньше 0'
+                            'Количество ингредиентов не может быть меньше 1'
                         )
                     }
                 )
