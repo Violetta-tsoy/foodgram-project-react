@@ -29,14 +29,6 @@ class Base64ImageField(serializers.ImageField):
             )
         return super().to_internal_value(data)
 
-# class Base64ImageField(serializers.ImageField):
-#     def to_internal_value(self, data):
-#         if isinstance(data, str) and data.startswith('data:image'):
-#             format, imgstr = data.split(';base64,')
-#             ext = format.split('/')[-1]
-#             data = ContentFile(base64.b64decode(imgstr), name='temp.' + ext)
-
-#         return super().to_internal_value(data)
 
 class UserGetSerializer(UserSerializer):
     """Сериализатор для просмотра профиля пользователя."""
@@ -358,7 +350,7 @@ class RecipeCreateSerializer(serializers.ModelSerializer):
 
     def validate_ingredients(self, data):
         ingredients = self.initial_data.get('ingredients')
-        if not len(ingredients) != 0:
+        if not ingredients:
             raise exceptions.ValidationError(
                 {'ingredients': 'Невозможно добавить рецепт без ингредиентов!'}
             )

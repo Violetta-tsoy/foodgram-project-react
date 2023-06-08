@@ -2,9 +2,9 @@ from urllib.parse import unquote
 
 from django.contrib.auth import update_session_auth_hash
 from django.db.models import Exists, OuterRef, Sum, Value
+from django.shortcuts import HttpResponse
 from django_filters.rest_framework import DjangoFilterBackend
 from djoser.serializers import SetPasswordSerializer
-
 from rest_framework import mixins, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.generics import get_object_or_404
@@ -13,7 +13,6 @@ from rest_framework.permissions import (
     IsAuthenticatedOrReadOnly
 )
 from rest_framework.response import Response
-
 
 from api import serializers
 from api.filters import RecipeFilter
@@ -27,7 +26,11 @@ from recipes.models import (
 from users.models import Follow, User
 from .pagination import UserPagination
 from .permissions import AuthorOrReadOnly
-from .utils import export_ingredients, serializer_add_method, serializer_delete_method
+from .utils import (
+    export_ingredients,
+    serializer_add_method,
+    serializer_delete_method
+)
 
 
 class UserViewSet(
@@ -63,7 +66,6 @@ class UserViewSet(
     )
     def me(self, request, *args, **kwargs):
         self.get_object = self.get_instance
-
         return self.retrieve(request, *args, **kwargs)
 
     @action(
@@ -195,17 +197,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def favorite(self, request, pk):
+        serializer = serializers.FavoriteSerializer(
+            context={'request': request})
         if request.method == 'POST':
-            return serializer_add_method(
+            serializer_add_method(
                 serializers.FavoriteSerializer,
                 request,
                 pk
             )
-        return serializer_delete_method(
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer_delete_method(
             Favorite,
             request,
             pk
         )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=True,
@@ -213,17 +219,21 @@ class RecipeViewSet(viewsets.ModelViewSet):
         permission_classes=(IsAuthenticated,),
     )
     def shopping_cart(self, request, pk):
+        serializer = serializers.ShoppingListSerializer(
+            context={'request': request})
         if request.method == 'POST':
-            return serializer_add_method(
+            serializer_add_method(
                 serializers.ShoppingListSerializer,
                 request,
                 pk
             )
-        return serializer_delete_method(
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        serializer_delete_method(
             ShoppingList,
             request,
             pk
         )
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
     @action(
         detail=False, methods=['GET'], permission_classes=(IsAuthenticated,)
@@ -237,4 +247,10 @@ class RecipeViewSet(viewsets.ModelViewSet):
             .order_by('ingredient__name')
             .annotate(amount=Sum('amount'))
         )
-        return export_ingredients(self, request, ingredients)
+        filename = 'shopping_list.txt'
+        shopping_list = export_ingredients(self, request, ingredients)
+        response = HttpResponse(
+            shopping_list, content_type='text/plain; charset=utf-8'
+        )
+        response['Content-Disposition'] = f'attachment; filename="{filename}"'
+        return response

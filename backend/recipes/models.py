@@ -102,7 +102,10 @@ class Recipe(models.Model):
         verbose_name='Время приготовления (в минутах)',
         help_text='Введите время приготовления блюда в минутах',
         validators=[
-            MinValueValidator(1, message='Укажите время больше либо равное 1'),
+            MinValueValidator(
+                1,
+                message='Укажите время больше либо равное 1'
+            ),
         ],
     )
 
