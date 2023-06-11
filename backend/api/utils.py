@@ -24,7 +24,7 @@ def export_ingredients(self, request, ingredients):
     user = self.request.user
     today = date.today()
     shopping_list = f'Список покупок пользователя: {user.username}\n\n'
-    shopping_list += f"Дата: {today:%Y-%m-%d}\n\n"
+    shopping_list += f'Дата: {today:%Y-%m-%d}\n\n'
 
     ingredient_lines = [
         f'- {ingredient["ingredient__name"]} '
@@ -32,6 +32,6 @@ def export_ingredients(self, request, ingredients):
         f'{ingredient["amount"]}'
         for ingredient in ingredients
     ]
-    shopping_list += "\n".join(ingredient_lines)
-    shopping_list += f"\n\nFoodgram ({today:%Y})"
+    shopping_list += '\n'.join(ingredient_lines)
+    shopping_list += f'\n\nFoodgram ({today:%Y})'
     return shopping_list
