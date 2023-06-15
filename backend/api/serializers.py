@@ -89,10 +89,10 @@ class UserRecipesSerializer(UserGetSerializer):
     def get_recipes(self, object):
         request = self.context.get('request')
         context = {'request': request}
-        recipe_limit = request.query_params.get('recipe_limit')
+        recipes_limit = request.query_params.get('recipes_limit')
         queryset = object.recipes.all()
-        if recipe_limit:
-            queryset = queryset[:int(recipe_limit)]
+        if recipes_limit:
+            queryset = queryset[:int(recipes_limit)]
 
         return RecipeShortSerializer(queryset, context=context, many=True).data
 

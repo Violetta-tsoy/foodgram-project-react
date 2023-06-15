@@ -169,6 +169,7 @@ docker cp docs/. <container_id>:/usr/share/nginx/html/api/docs
 ## Примеры:
 Для просмотра документации с примерами перейдите по адресу:
 http://51.250.111.79/api/docs/redoc.html
-Панель администратора: http://51.250.111.79/admin
+Докуметация к API: http://51.250.111.79/api/docs/
 Главная страница сайта: http://51.250.111.79/recipes
+
 
