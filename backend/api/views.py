@@ -62,7 +62,7 @@ class UserViewSet(
 
     @action(
         detail=False,
-        # permission_classes=[IsAuthenticated],
+        permission_classes=[AuthorOrReadOnly],
     )
     def me(self, request, *args, **kwargs):
         self.get_object = self.get_instance
