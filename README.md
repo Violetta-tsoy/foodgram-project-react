@@ -126,13 +126,6 @@ TELEGRAM_TOKEN=<токен вашего бота>
 ### Работа с контейнерами на сервере
 Зайдите на ваш сервер ssh your_login@public_ip
 
-Пройдите к директорию, где у вас находится фаил docker-compose.yml и выполните команды:
-```
-docker compose exec backend python manage.py makemigrations
-docker compose exec backend python manage.py migrate
-docker compose exec backend python manage.py createsuperuser
-docker compose exec backend python manage.py collectstatic --no-input
-```
 Для заполнения базы данными:
 1. Скопируйте папку data на ваш сервер
 ```
@@ -146,10 +139,15 @@ docker container ls
 ```
 docker cp data/ <container_id>:data/
 ```
-4. Импортируйте данные
+4. Пройдите к директорию, где у вас находится фаил docker-compose.yml и выполните команды:
 ```
 docker compose exec backend python manage.py makemigrations
 docker compose exec backend python manage.py migrate
+```
+Создайте супрепользователя и загрузите статику:
+```
+docker compose exec backend python manage.py createsuperuser
+docker compose exec backend python manage.py collectstatic --no-input
 ```
 
 Добавьте API документацию:
@@ -168,8 +166,8 @@ docker cp docs/. <container_id>:/usr/share/nginx/html/api/docs
 
 ## Примеры:
 Для просмотра документации с примерами перейдите по адресу:
-http://51.250.111.79/api/docs/redoc.html
-Докуметация к API: http://51.250.111.79/api/docs/
+http://51.250.111.79/api/docs/
+
 Главная страница сайта: http://51.250.111.79/recipes
 
-
+Адрес для работы с админпанелью: http://51.250.111.79/admin
