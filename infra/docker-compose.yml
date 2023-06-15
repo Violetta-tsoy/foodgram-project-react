@@ -9,7 +9,7 @@ services:
       - db_data:/var/lib/postgresql/data/
 
   backend:
-    image: vetatsoi/foodgram_backend:latest
+    image: "{DOCKER_USERNAME}/foodgram_backend:latest"
     restart: always
     volumes:
         - static_value:/app/static/
@@ -20,7 +20,7 @@ services:
         - ./.env
 
   frontend:
-    image: vetatsoi/foodgram_frontend:latest
+    image: "${DOCKER_USERNAME}/foodgram_frontend:latest"
     volumes:
       - ../frontend/:/app/result_build/
     depends_on:
